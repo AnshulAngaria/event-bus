@@ -61,3 +61,24 @@ func (eventBus *EventBus) PublishAsync(topic string, data interface{}) {
 		}
 	}(channels, event)
 }
+
+func (eventBus *EventBus) AddTopic(topic string) {
+	eventBus.Lock()
+	eventBus.Unlock()
+
+	eventBus.subscibers[topic] = make(subscribersChannels, 0)
+}
+
+func (eb *EventBus) Subsribe(topic string) eventChannel {
+	eb.Lock()
+	defer eb.Unlock()
+	ec := make(eventChannel)
+
+	if subscribers, found := eb.subscibers[topic]; found {
+		eb.subscibers[topic] = append(subscribers, ec)
+	} else {
+		eb.subscibers[topic] = append(subscribersChannels{}, ec)
+	}
+
+	return ec
+}
